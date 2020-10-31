@@ -1,3 +1,6 @@
+// TODO: Ao achar a melhor solução, continuar buscando até que não se ache mais nenhuma
+// solução melhor
+// TODO: Separar os itens da questão em A, B, C
 const Neighbors = require("./neighbors.js");
 
 const values = {
