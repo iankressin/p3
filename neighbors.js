@@ -1,60 +1,79 @@
 class Neighbors {
-  constructor(stocks, initialSolution, values, percenteages) {
-    this._stocks = stocks;
+  constructor(values, percenteages) {
     this._values = values;
     this._percentages = percenteages;
-    this._initialSolution = initialSolution;
-    this._neighbors = [this._initialSolution];
   }
 
-  getNeighbors = () => {
-    this._findNeighbors();
+  solution = currentSolution => {
+    const neighbors = this._findNeighbors(currentSolution);
+    const currentBest = this._getBestNeighbor(neighbors, currentSolution);
 
-    return this._neighbors;
+    if (currentBest.position !== -1) {
+      return currentBest;
+    } else {
+      this.solution(currentBest.stocks);
+    }
   };
 
-  getBestNeighbor = () => {
-    // Se bestSolution === 0, então nenhum vizinho possui uma solução melhor
-    let bestSolution = { position: -1, value: 0 };
+  _findNeighbors = initialSolution => {
+    const neighbors = [];
+    for (let i = 0; i < this._percentages.length; i++) {
+      const permutations = this._permutateStock(
+        i,
+        initialSolution[i],
+        initialSolution
+      );
+      neighbors.push(...permutations);
+    }
 
-    if (this._neighbors.length === 0) this._findNeighbors();
+    return neighbors;
+  };
 
-    this._neighbors.forEach((neighbor, index) => {
-      let total = 0;
-      for (let i = 0; i < this._percentages.length; i++) {
-        total += this._values[neighbor[i]] * this._percentages[i];
-      }
+  _permutateStock = (currentIndex, currentStock, initialSolution) => {
+    const permutations = [];
 
-      if (total > bestSolution.value) {
+    for (let j = currentIndex + 1; j < initialSolution.length; j++) {
+      const change = initialSolution[j];
+
+      let neighbor = initialSolution.slice(); // Cria uma nova copia do array
+      neighbor[currentIndex] = change;
+      neighbor[j] = currentStock;
+
+      permutations.push(neighbor);
+    }
+
+    return permutations;
+  };
+
+  _getBestNeighbor = (neighbors, currentBest) => {
+    // Se position === -1, então nenhum vizinho possui uma solução melhor
+    let bestSolution = {
+      position: -1,
+      stocks: currentBest,
+      profit: this._calculateProfit(currentBest)
+    };
+
+    neighbors.forEach((neighbor, index) => {
+      const profit = this._calculateProfit(neighbor);
+
+      if (profit > bestSolution.profit) {
         bestSolution.position = index;
-        bestSolution.value = total;
+        bestSolution.stocks = neighbors[bestSolution.position];
+        bestSolution.profit = profit;
       }
     });
 
-    return {
-      investiments: this._neighbors[bestSolution.position],
-      value: bestSolution.value
-    };
+    return bestSolution;
   };
 
-  _findNeighbors = () => {
-    for (let i = 0; i < this._initialSolution.length; i++) {
-      this._permutateStock(i);
+  _calculateProfit = stocks => {
+    let total = 0;
+
+    for (let i = 0; i < this._percentages.length; i++) {
+      total += this._values[stocks[i]] * this._percentages[i];
     }
-  };
 
-  _permutateStock = currentIndex => {
-    const stock = this._initialSolution[currentIndex];
-    for (let j = currentIndex + 1; j < this._stocks.length; j++) {
-      // Gambiarra do javascript para criar uma nova referência da propriedade da classe
-      let neighbor = this._stocks.slice();
-      const change = this._stocks[j];
-
-      neighbor[currentIndex] = change;
-      neighbor[j] = stock;
-
-      this._neighbors.push(neighbor);
-    }
+    return total;
   };
 }
 
