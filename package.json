@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "answer": "node main.js"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,6 @@
   "bugs": {
     "url": "https://github.com/iankressin/p3/issues"
   },
-  "homepage": "https://github.com/iankressin/p3#readme"
+  "homepage": "https://github.com/iankressin/p3#readme",
+  "dependencies": {}
 }
